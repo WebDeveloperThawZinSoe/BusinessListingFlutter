@@ -3,7 +3,9 @@
 
     <!-- Required to query installed packages -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <application
         android:label="YangonLINK"
         android:name="${applicationName}"

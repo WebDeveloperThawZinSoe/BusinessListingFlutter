@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'category_screen.dart';
 import 'region_screen.dart';
+import 'faq_screen.dart';
+import 'nearBy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -17,7 +17,7 @@ class BusinessListingApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Roboto', // Premium sleek font
+        fontFamily: 'Roboto',
       ),
       home: BusinessHomePage(),
     );
@@ -34,128 +34,8 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
   static final List<Widget> _widgetOptions = <Widget>[
     CategoryScreen(),
     RegionScreen(),
+    Nearby()
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _checkVersion();
-  }
-
-  Future<void> _checkVersion() async {
-    const String currentVersion = "1.0.0"; // Change this when updating the app
-    const String apiUrl = "https://cryptodroplists.com/api/version";
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        body: {"version": currentVersion},
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        if (data["status"] == false) {
-          _showUpdateDialog(data["message"], data["play_store"], data["app_store"], data["direct"]);
-        }
-      }
-    } catch (e) {
-      print("Version check failed: $e");
-    }
-  }
-
-  void _showUpdateDialog(String message, String playStore, String appStore, String direct) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // App Icon
-                Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.system_update,
-                    color: Colors.blueAccent,
-                    size: 60,
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                // Title
-                Text(
-                  "Update Available",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10),
-
-                // Message
-                Text(
-                  message,
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-
-                // Buttons Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildUpdateButton("Play Store", playStore, Colors.green),
-                    _buildUpdateButton("App Store", appStore, Colors.orange),
-                    _buildUpdateButton("Direct", direct, Colors.blue),
-                  ],
-                ),
-                SizedBox(height: 10),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-// Custom Button Widget
-  Widget _buildUpdateButton(String label, String url, Color color) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      onPressed: () => _launchURL(url),
-      child: Text(
-        label,
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      print("Could not launch $url");
-    }
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -178,18 +58,134 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
         ),
         backgroundColor: Colors.blueAccent,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
+        actions: [
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: Icon(Icons.menu, size: 30, color: Colors.white),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+              );
+            },
+          ),
+        ],
       ),
+
+      // Right-side Drawer
+      endDrawer: Drawer(
+        child: Column(
+          children: [
+            // User Profile Section
+            DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blueAccent, Colors.blue.shade900],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage('images/icon/logo.jpg'),
+                  ),
+                  SizedBox(width: 15),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome to',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Yangon Link',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Menu Items
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildMenuItem(Icons.home, 'Home', () {
+                    setState(() {
+                      _selectedIndex = 0;
+                    });
+                    Navigator.pop(context);
+                  }),
+                  _buildMenuItem(Icons.map, 'Townships', () {
+                    setState(() {
+                      _selectedIndex = 1;
+                    });
+                    Navigator.pop(context);
+                  }),
+                  _buildMenuItem(Icons.location_on, 'Nearby', () {
+                    setState(() {
+                      _selectedIndex = 2;
+                    });
+                    Navigator.pop(context);
+                  }),
+                  _buildMenuItem(Icons.question_mark_rounded, 'FAQs', () {
+                    setState(() {
+                      _selectedIndex = 3;
+                    });
+                    Navigator.pop(context);
+                  }),
+                  Divider(thickness: 1, color: Colors.grey.shade300),
+                  _buildMenuItem(Icons.phone_forwarded, 'Contact Us', () {
+                    Navigator.pop(context);
+                  }),
+                  _buildMenuItem(Icons.store_mall_directory, 'Become A Shop', () {
+                    Navigator.pop(context);
+                  }),
+                ],
+              ),
+            ),
+
+            // Footer
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                'Version 1.0.0',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+
       body: _widgetOptions[_selectedIndex],
+
+      // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.category, size: 30),
-            label: 'Category',
+            icon: Icon(Icons.home, size: 30),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.map, size: 30),
-            label: 'Region',
+            label: 'Township',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on, size: 30),
+            label: 'Nearby',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -198,6 +194,15 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
         type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
       ),
+    );
+  }
+
+  // Custom Drawer Menu Item
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.blueAccent),
+      title: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      onTap: onTap,
     );
   }
 }

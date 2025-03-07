@@ -21,6 +21,9 @@ dependencies:
   shimmer: ^3.0.0
   google_maps_flutter: ^2.10.1
   flutter_launcher_icons: ^0.14.3
+  geolocator: ^13.0.2
+  permission_handler: ^11.0.1
+  flutter_animate: ^4.5.2
 
 dev_dependencies:
   flutter_test:
