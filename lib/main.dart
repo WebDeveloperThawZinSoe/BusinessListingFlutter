@@ -34,7 +34,7 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
   static final List<Widget> _widgetOptions = <Widget>[
     CategoryScreen(),
     RegionScreen(),
-    Nearby()
+    Nearby(),
   ];
 
   void _onItemTapped(int index) {
@@ -141,19 +141,39 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
                     });
                     Navigator.pop(context);
                   }),
-                  _buildMenuItem(Icons.question_mark_rounded, 'FAQs', () {
-                    setState(() {
-                      _selectedIndex = 3;
-                    });
-                    Navigator.pop(context);
-                  }),
+                  _buildMenuItem(
+                    Icons.question_mark_rounded,
+                    'FAQs',
+                        () {
+                      Navigator.pop(context); // Close the drawer if applicable
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => FaqScreen()),
+                      );
+                    },
+                  ),
+
+
+
                   Divider(thickness: 1, color: Colors.grey.shade300),
                   _buildMenuItem(Icons.phone_forwarded, 'Contact Us', () {
                     Navigator.pop(context);
                   }),
-                  _buildMenuItem(Icons.store_mall_directory, 'Become A Shop', () {
-                    Navigator.pop(context);
-                  }),
+                  _buildMenuItem(
+                    Icons.store_mall_directory,
+                    'Become A Shop',
+                        () async {
+                      Navigator.pop(context); // Close the drawer if applicable
+                      final Uri url = Uri.parse('https://cryptodroplists.com/register');
+
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                  ),
+
                 ],
               ),
             ),
