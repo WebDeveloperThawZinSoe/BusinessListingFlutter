@@ -4,6 +4,7 @@ import 'region_screen.dart';
 import 'faq_screen.dart';
 import 'nearBy.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'contact_screen.dart';
 
 void main() {
   runApp(BusinessListingApp());
@@ -157,7 +158,11 @@ class _BusinessHomePageState extends State<BusinessHomePage> {
 
                   Divider(thickness: 1, color: Colors.grey.shade300),
                   _buildMenuItem(Icons.phone_forwarded, 'Contact Us', () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close the drawer if applicable
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ContactScreen()),
+                    );
                   }),
                   _buildMenuItem(
                     Icons.store_mall_directory,
